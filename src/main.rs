@@ -7,11 +7,19 @@ use std::path::{Path, PathBuf};
 use std::str;
 
 fn main() {
-    let mut path = format!("{}", dirs::home_dir().unwrap().display());
-    path.push_str("/Library/Application Support/Firefox/Profiles");
-    path.push_str("/*default*/sessionstore-backups/recovery.jsonlz4");
+    let home = dirs::home_dir().unwrap_or_else(|| panic!("Couldn't find home directory"));
+    let path: PathBuf = [
+        home.to_str().unwrap(),
+        "Library",
+        "Application Support",
+        "Firefox",
+        "Profiles",
+        "*default*",
+        "sessionstore-backups",
+        "recovery.jsonlz4"
+    ].iter().collect();
 
-    for result in glob(&path).unwrap() {
+    for result in glob(path.to_str().unwrap()).unwrap() {
         let item = result.unwrap();
         match decompressed_contents(item) {
             Ok(s) => println!("{}", s),
