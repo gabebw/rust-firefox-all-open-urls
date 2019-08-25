@@ -1,28 +1,28 @@
 use dirs;
 use glob::glob;
 use lz4::block;
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize};
 use std::fs::File;
 use std::io::{self, ErrorKind, Read};
 use std::path::{Path, PathBuf};
 use std::str;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Deserialize)]
 struct TopLevel {
     windows: Vec<Window>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Deserialize)]
 struct Window {
     tabs: Vec<Tab>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Deserialize)]
 struct Tab {
     entries: Vec<Entry>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Deserialize)]
 struct Entry {
     url: String,
 }
