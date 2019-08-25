@@ -28,10 +28,7 @@ fn decompressed_contents(item: PathBuf) -> io::Result<String> {
 // Re-wrap the `Utf8Error` in `str::from_utf8` in an `io::Error` so we can always return an
 // `io::Result` in `decompressed_contents`
 fn convert_to_string<'a>(blocks: &'a Vec<u8>) -> io::Result<&'a str> {
-    match str::from_utf8(&blocks[..]) {
-        Ok(s) => Ok(s),
-        Err(e) => Err(io::Error::new(ErrorKind::Other, e))
-    }
+    str::from_utf8(&blocks[..]).map_err(|e| io::Error::new(ErrorKind::Other, e))
 }
 
 fn decompress(source: &Path) -> io::Result<Vec<u8>> {
