@@ -8,6 +8,10 @@ successfully).
 
     cargo install --git https://github.com/gabebw/rust-firefox-all-open-urls
 
+## Usage
+
+    firefox-all-open-urls
+
 ## How it works
 
 When Firefox is open (and only when it's open), it creates a file called
