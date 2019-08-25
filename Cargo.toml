@@ -1,5 +1,5 @@
 [package]
-name = "firefox-open-urls-parser"
+name = "firefox-all-open-urls"
 version = "0.1.0"
 authors = ["Gabe Berke-Williams <gabebw@gabebw.com>"]
 edition = "2018"

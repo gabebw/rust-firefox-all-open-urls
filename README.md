@@ -6,7 +6,7 @@ successfully).
 
 ## Installation
 
-    cargo install --git https://github.com/gabebw/rust-firefox-open-urls-parser
+    cargo install --git https://github.com/gabebw/rust-firefox-all-open-urls
 
 ## How it works
 
