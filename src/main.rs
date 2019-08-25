@@ -2,7 +2,7 @@ use dirs;
 use glob::glob;
 use lz4::block;
 use std::fs::File;
-use std::io::{self, ErrorKind, Read, Seek, SeekFrom};
+use std::io::{self, ErrorKind, Read};
 use std::path::{Path, PathBuf};
 use std::str;
 
@@ -42,7 +42,6 @@ fn convert_to_string<'a>(blocks: &'a Vec<u8>) -> io::Result<&'a str> {
 fn decompress(source: &Path) -> io::Result<Vec<u8>> {
     let mut input_file = File::open(source)?;
     let mut input_buffer = Vec::new();
-    input_file.seek(SeekFrom::Start(8))?;
     input_file.read_to_end(&mut input_buffer)?;
-    block::decompress(&input_buffer[..], None)
+    block::decompress(&input_buffer[8..], None)
 }
