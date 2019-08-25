@@ -1,10 +1,31 @@
 use dirs;
 use glob::glob;
 use lz4::block;
+use serde::{Deserialize, Serialize};
 use std::fs::File;
 use std::io::{self, ErrorKind, Read};
 use std::path::{Path, PathBuf};
 use std::str;
+
+#[derive(Serialize, Deserialize)]
+struct TopLevel {
+    windows: Vec<Window>,
+}
+
+#[derive(Serialize, Deserialize)]
+struct Window {
+    tabs: Vec<Tab>,
+}
+
+#[derive(Serialize, Deserialize)]
+struct Tab {
+    entries: Vec<Entry>,
+}
+
+#[derive(Serialize, Deserialize)]
+struct Entry {
+    url: String,
+}
 
 fn main() {
     let home = dirs::home_dir().unwrap_or_else(|| panic!("Couldn't find home directory"));
@@ -21,11 +42,17 @@ fn main() {
 
     for result in glob(path.to_str().unwrap()).unwrap() {
         let item = result.unwrap();
-        match decompressed_contents(item) {
-            Ok(s) => println!("{}", s),
-            Err(e) => eprintln!("{}", e)
-        }
+        run(item).unwrap_or_else(|e| eprintln!("{}", e));
     }
+}
+
+fn run(item: PathBuf) -> io::Result<()> {
+    let json = decompressed_contents(item)?;
+    let urls = parse_json(&json)?;
+    for url in urls {
+        println!("{}", url);
+    }
+    Ok(())
 }
 
 fn decompressed_contents(item: PathBuf) -> io::Result<String> {
@@ -45,4 +72,19 @@ fn decompress(source: &Path) -> io::Result<Vec<u8>> {
     input_file.read_to_end(&mut input_buffer)?;
     // Skip the first 8 bytes: "mozLz40\0"
     block::decompress(&input_buffer[8..], None)
+}
+
+fn parse_json(json: &str) -> serde_json::Result<Vec<String>> {
+    let v: TopLevel = serde_json::from_str(json)?;
+    Ok(v.windows.into_iter().flat_map(|window|
+        window.tabs.into_iter().flat_map(|tab|
+            tab.entries.into_iter().filter_map(|entry|
+                if &entry.url[..6] == "about:" {
+                    None
+                } else {
+                    Some(entry.url)
+                }
+            )
+        )
+    ).collect())
 }
