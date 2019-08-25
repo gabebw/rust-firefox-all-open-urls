@@ -10,7 +10,6 @@ fn main() {
     let mut path = format!("{}", dirs::home_dir().unwrap().display());
     path.push_str("/Library/Application Support/Firefox/Profiles");
     path.push_str("/*default*/sessionstore-backups/recovery.jsonlz4");
-    let path = "recovery.jsonlz4";
 
     for result in glob(&path).unwrap() {
         let item = result.unwrap();
