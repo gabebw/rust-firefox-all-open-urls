@@ -43,5 +43,6 @@ fn decompress(source: &Path) -> io::Result<Vec<u8>> {
     let mut input_file = File::open(source)?;
     let mut input_buffer = Vec::new();
     input_file.read_to_end(&mut input_buffer)?;
+    // Skip the first 8 bytes: "mozLz40\0"
     block::decompress(&input_buffer[8..], None)
 }
