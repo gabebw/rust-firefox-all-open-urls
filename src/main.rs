@@ -84,9 +84,10 @@ fn is_good_url(entry: Entry) -> Option<String> {
 
 fn parse_json(json: &str) -> serde_json::Result<Vec<String>> {
     let v: TopLevel = serde_json::from_str(json)?;
-    Ok(v.windows.into_iter().flat_map(|window|
+    let urls = v.windows.into_iter().flat_map(|window|
         window.tabs.into_iter().flat_map(|tab|
             tab.entries.into_iter().filter_map(is_good_url)
         )
-    ).collect())
+    ).collect();
+    Ok(urls)
 }
