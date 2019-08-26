@@ -74,17 +74,19 @@ fn decompress(source: &Path) -> io::Result<Vec<u8>> {
     block::decompress(&input_buffer[8..], None)
 }
 
+fn is_good_url(entry: Entry) -> Option<String> {
+    if &entry.url[..6] == "about:" {
+        None
+    } else {
+        Some(entry.url.to_string())
+    }
+}
+
 fn parse_json(json: &str) -> serde_json::Result<Vec<String>> {
     let v: TopLevel = serde_json::from_str(json)?;
     Ok(v.windows.into_iter().flat_map(|window|
         window.tabs.into_iter().flat_map(|tab|
-            tab.entries.into_iter().filter_map(|entry|
-                if &entry.url[..6] == "about:" {
-                    None
-                } else {
-                    Some(entry.url)
-                }
-            )
+            tab.entries.into_iter().filter_map(is_good_url)
         )
     ).collect())
 }
