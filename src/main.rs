@@ -27,8 +27,20 @@ struct Entry {
     url: String,
 }
 
-fn main() {
-    let home = dirs::home_dir().unwrap_or_else(|| panic!("Couldn't find home directory"));
+fn get_recovery_path() -> PathBuf {
+    let home = dirs::home_dir().expect("Couldn't find home directory");
+
+    #[cfg(target_os = "linux")]
+    let path: PathBuf = [
+        home.to_str().unwrap(),
+        ".mozilla",
+        "firefox",
+        "*default*",
+        "sessionstore-backups",
+        "recovery.jsonlz4"
+    ].iter().collect();
+
+    #[cfg(target_os = "macos")]
     let path: PathBuf = [
         home.to_str().unwrap(),
         "Library",
@@ -39,6 +51,12 @@ fn main() {
         "sessionstore-backups",
         "recovery.jsonlz4"
     ].iter().collect();
+
+    path
+}
+
+fn main() {
+    let path = get_recovery_path();
 
     for result in glob(path.to_str().unwrap()).unwrap() {
         let item = result.unwrap();
